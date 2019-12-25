@@ -10,7 +10,6 @@ import sdl2.filledCircleRGBA
 import sdl2.thickLineRGBA
 import kotlin.math.min
 
-
 val GRID_COLOR: CValue<SDL_Color> = cValue {
     r = 255u
     g = 255u
@@ -38,9 +37,9 @@ fun CValuesRef<SDL_Renderer>.renderGrid(color: CValue<SDL_Color>) = color.useCon
 }
 
 fun CValuesRef<SDL_Renderer>.renderX(row: Int, column: Int, color: CValue<SDL_Color>) = color.useContents {
-    val halfBoxSide: Double = min(cellWidth, cellHeight) * 0.25;
-    val centerX: Double = cellWidth * 0.5 + column * cellWidth;
-    val centerY: Double = cellHeight * 0.5 + row * cellHeight;
+    val halfBoxSide: Double = min(cellWidth, cellHeight) * 0.25
+    val centerX: Double = cellWidth * 0.5 + column * cellWidth
+    val centerY: Double = cellHeight * 0.5 + row * cellHeight
 
     thickLineRGBA(
         this@renderX,
@@ -69,17 +68,19 @@ fun CValuesRef<SDL_Renderer>.renderX(row: Int, column: Int, color: CValue<SDL_Co
     )
 }
 
-fun CValuesRef<SDL_Renderer>.renderO(row: Int, column: Int, color: CValue<SDL_Color>) = color.useContents {
-    val half_box_side: Double = min(cellWidth, cellHeight) * 0.25;
-    val center_x: Double = cellWidth * 0.5 + column * cellWidth;
-    val center_y: Double = cellHeight * 0.5 + row * cellHeight;
+fun CValuesRef<SDL_Renderer>.renderO(row: Int, column: Int, color: CValue<SDL_Color>) {
+    val halfBoxSide: Double = min(cellWidth, cellHeight) * 0.25
+    val centerX: Short = (cellWidth * 0.5 + column * cellWidth).toShort()
+    val centerY: Short = (cellHeight * 0.5 + row * cellHeight).toShort()
+
+    color.useContents {
+        filledCircleRGBA(
+            this@renderO, centerX, centerY, (halfBoxSide + 5).toShort(), r, g, b, 255
+        )
+    }
 
     filledCircleRGBA(
-        this@renderO, center_x.toShort(), center_y.toShort(), (half_box_side + 5).toShort(), r, g, b, 255
-    )
-
-    filledCircleRGBA(
-        this@renderO, center_x.toShort(), center_y.toShort(), (half_box_side - 5).toShort(), 0, 0, 0, 255
+        this, centerX, centerY, (halfBoxSide - 5).toShort(), 0, 0, 0, 255
     )
 }
 

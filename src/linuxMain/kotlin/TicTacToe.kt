@@ -1,11 +1,8 @@
 import cnames.structs.SDL_Renderer
 import cnames.structs.SDL_Window
 import kotlinx.cinterop.CPointer
-import kotlinx.cinterop.CValuesRef
 import kotlinx.cinterop.alloc
-import kotlinx.cinterop.cValue
 import kotlinx.cinterop.memScoped
-import kotlinx.cinterop.pointed
 import kotlinx.cinterop.ptr
 import platform.posix.EXIT_FAILURE
 import platform.posix.EXIT_SUCCESS
@@ -29,7 +26,7 @@ import sdl2.SDL_RenderPresent
 import sdl2.SDL_SetRenderDrawColor
 import sdl2.SDL_WINDOW_SHOWN
 
-fun main(args: Array<String>): Unit = memScoped {
+fun main(): Unit = memScoped {
     if (SDL_Init(SDL_INIT_VIDEO) != 0) {
         printf("Could not initialize sdl2: %s", SDL_GetError())
         return exit(EXIT_FAILURE)
@@ -37,9 +34,14 @@ fun main(args: Array<String>): Unit = memScoped {
 
     val window: CPointer<SDL_Window>? =
         SDL_CreateWindow("Tic Tac Toe KT", 100, 100, screenWidth, screenHeight, SDL_WINDOW_SHOWN)
+
     if (window == null) {
         printf("SDL_CreateWindow Error: %s", SDL_GetError())
         return exit(EXIT_FAILURE)
+    }
+
+    defer {
+        SDL_DestroyWindow(window)
     }
 
     val renderer: CPointer<SDL_Renderer>? =
@@ -51,15 +53,13 @@ fun main(args: Array<String>): Unit = memScoped {
         return exit(EXIT_FAILURE)
     }
 
-    Array(size * size) { Cell(null) }
     val game = Game(Array(size * size) { Cell(null) }, Player.X, State.RUNNING)
     val event = alloc<SDL_Event>()
     while (game.state != State.QUIT) {
         while (SDL_PollEvent(event.ptr) != 0) {
             when (event.type) {
-                SDL_QUIT -> {
-                    game.state = State.QUIT
-                }
+                SDL_QUIT -> game.state = State.QUIT
+
                 SDL_MOUSEBUTTONDOWN -> Logic.run {
                     game.clickOnCell(event.button.y / cellHeight, event.button.x / cellWidth)
                 }
@@ -68,13 +68,12 @@ fun main(args: Array<String>): Unit = memScoped {
             }
         }
 
-        SDL_SetRenderDrawColor(renderer, 0, 0, 0 , 255)
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255)
         SDL_RenderClear(renderer)
         renderer.renderGame(game)
         SDL_RenderPresent(renderer)
     }
 
-    SDL_DestroyWindow(window)
     SDL_Quit()
 
     return exit(EXIT_SUCCESS)

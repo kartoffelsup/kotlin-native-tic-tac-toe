@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
     kotlin("multiplatform") version "1.3.61"
 }
@@ -9,13 +11,17 @@ repositories {
     mavenCentral()
 }
 
+tasks.withType<KotlinCompile>{
+    kotlinOptions.freeCompilerArgs += "-Xuse-experimental=kotlin.ExperimentalUnsignedTypes"
+}
+
 kotlin {
     /* Targets configuration omitted. 
     *  To find out how to configure the targets, please follow the link:
     *  https://kotlinlang.org/docs/reference/building-mpp-with-gradle.html#setting-up-targets */
     linuxX64("linux") {
         binaries {
-            executable(buildTypes = setOf(DEBUG)) {
+            executable(buildTypes = setOf(DEBUG, RELEASE)) {
                entryPoint = "main"
             }
         }
