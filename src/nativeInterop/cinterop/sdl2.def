@@ -1,0 +1,7 @@
+headers = SDL.h SDL2_gfxPrimitives.h
+entryPoint = SDL_main
+
+compilerOpts = -D_POSIX_SOURCE
+compilerOpts.linux = -D_REENTRANT
+
+linkerOpts.linux = -L/usr/lib64 -L/usr/lib/x86_64-linux-gnu -L/lib/x86_64-linux-gnu/ -lSDL2 -lSDL2_gfx
